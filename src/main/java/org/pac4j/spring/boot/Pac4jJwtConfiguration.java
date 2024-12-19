@@ -33,6 +33,7 @@ import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.config.signature.SignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -61,10 +62,9 @@ public class Pac4jJwtConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public EncryptionConfiguration encryptionConfiguration() {
-		SecretEncryptionConfiguration encryptionConfiguration = new SecretEncryptionConfiguration(
-				jwtProperties.getEncryptSecret(), JWEAlgorithm.parse(jwtProperties.getJweAlgorithm().value()),
-				EncryptionMethod.parse(jwtProperties.getEncryption().value()));
-		return encryptionConfiguration;
+        return new SecretEncryptionConfiguration(
+                jwtProperties.getEncryptSecret(), JWEAlgorithm.parse(jwtProperties.getJweAlgorithm().value()),
+                EncryptionMethod.parse(jwtProperties.getEncryption().value()));
 	}
 	
 	@Bean
@@ -92,14 +92,14 @@ public class Pac4jJwtConfiguration {
 	}
 	
 	@Bean("jwtUpcAuthenticator")
-	public UsernamePasswordCaptchaAuthenticator jwtUpcAuthenticator(CaptchaResolver captchaResolver,
-			AuthenticatingFailureCounter failureCounter) {
+	public UsernamePasswordCaptchaAuthenticator jwtUpcAuthenticator(ObjectProvider<CaptchaResolver> captchaResolver,
+																	ObjectProvider<AuthenticatingFailureCounter> failureCounter) {
 		
 		UsernamePasswordCaptchaAuthenticator authenticator = new UsernamePasswordCaptchaAuthenticator();
 		
 		authenticator.setCaptchaRequired(jwtProperties.isCaptchaRequired());
-		authenticator.setCaptchaResolver(captchaResolver);
-		authenticator.setFailureCounter(failureCounter);
+		authenticator.setCaptchaResolver(captchaResolver.getIfAvailable());
+		authenticator.setFailureCounter(failureCounter.getIfAvailable());
 		authenticator.setRetryTimesKeyAttribute(jwtProperties.getRetryTimesKeyAttribute());
 		authenticator.setRetryTimesWhenAccessDenied(jwtProperties.getRetryTimesWhenAccessDenied());
 		
@@ -108,14 +108,11 @@ public class Pac4jJwtConfiguration {
 	
 	@Bean("jwtUpcCredentialsExtractor")
 	public UsernamePasswordCaptchaCredentialsExtractor jwtUpcCredentialsExtractor() {
-
-		UsernamePasswordCaptchaCredentialsExtractor credentialsExtractor = new UsernamePasswordCaptchaCredentialsExtractor(
-				jwtProperties.getUsernameParameterName(),
-				jwtProperties.getPasswordParameterName(), 
-				jwtProperties.getCaptchaParamName(),
-				jwtProperties.isPostOnly());
-		
-		return credentialsExtractor;
+        return new UsernamePasswordCaptchaCredentialsExtractor(
+                jwtProperties.getUsernameParameterName(),
+                jwtProperties.getPasswordParameterName(),
+                jwtProperties.getCaptchaParamName(),
+                jwtProperties.isPostOnly());
 		
 	}
 	

@@ -1,6 +1,6 @@
 package org.pac4j.spring.boot;
 
-import org.jasig.cas.client.util.CommonUtils;
+import org.apereo.cas.client.util.CommonUtils;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
 import org.pac4j.cas.client.direct.DirectCasClient;
@@ -8,10 +8,8 @@ import org.pac4j.cas.client.direct.DirectCasProxyClient;
 import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
 import org.pac4j.cas.client.rest.CasRestFormClient;
 import org.pac4j.cas.config.CasConfiguration;
-import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.http.callback.CallbackUrlResolver;
 import org.pac4j.core.http.url.UrlResolver;
-import org.pac4j.core.logout.handler.LogoutHandler;
 import org.pac4j.spring.boot.utils.Pac4jUrlUtils;
 import org.pac4j.spring.boot.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +43,7 @@ public class Pac4jCasConfiguration {
 	}
 	
 	@Bean
-	public CasConfiguration casConfiguration(LogoutHandler<JEEContext> logoutHandler, UrlResolver urlResolver,
+	public CasConfiguration casConfiguration(UrlResolver urlResolver,
 			@Autowired(required = false) CasProxyReceptor proxyReceptor) {
 
 		CasConfiguration configuration = new CasConfiguration(pac4jCasProperties.getLoginUrl(), pac4jCasProperties.getProtocol() );
@@ -64,7 +62,6 @@ public class Pac4jCasConfiguration {
 		map.from(pac4jCasProperties.getCustomParams()).to(configuration::setCustomParams);
 		map.from(pac4jCasProperties.isGateway()).to(configuration::setGateway);
 		map.from(pac4jCasProperties.getLoginUrl()).to(configuration::setLoginUrl);
-		map.from(logoutHandler).to(configuration::setLogoutHandler);
 		map.from(pac4jCasProperties.getMethod()).to(configuration::setMethod);
 		map.from(pac4jCasProperties.getPostLogoutUrlParameter()).to(configuration::setPostLogoutUrlParameter);
 		map.from(pac4jCasProperties.getPrefixUrl()).to(configuration::setPrefixUrl);
