@@ -20,12 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.CheckHttpMethodAuthorizer;
 import org.pac4j.core.authorization.generator.AuthorizationGenerator;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.HttpConstants.HTTP_METHOD;
+import org.pac4j.core.engine.SecurityLogic;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.http.callback.CallbackUrlResolver;
@@ -33,6 +35,7 @@ import org.pac4j.core.http.url.UrlResolver;
 import org.pac4j.http.authorization.authorizer.IpRegexpAuthorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -84,7 +87,11 @@ public class Pac4jAutoConfiguration {
 	}
 	
 	@Bean
-	public Config config(Pac4jProperties pac4jProperties, Clients clients, HttpActionAdapter httpActionAdapter) {
+	public Config config(Pac4jProperties pac4jProperties, Clients clients,
+						 ObjectProvider<Authorizer> authorizerProvider,
+						 ObjectProvider<SecurityLogic> securityLogicProvider,
+						 ObjectProvider<HttpActionAdapter> httpActionAdapterProvider) {
+		authorizerProvider.
 		
 		final Config config = new Config(clients);
 		
@@ -114,7 +121,7 @@ public class Pac4jAutoConfiguration {
 		//config.addMatcher("method", new HttpMethodMatcher());
 		
 		config.setClients(clients);
-		config.setHttpActionAdapter(httpActionAdapter);
+		config.setHttpActionAdapter(httpActionAdapterProvider.getIfAvailable());
 		//config.setSessionStore(sessionStore);
 		
 		return config;
