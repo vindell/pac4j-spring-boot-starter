@@ -91,8 +91,7 @@ public class Pac4jAutoConfiguration {
 						 ObjectProvider<Authorizer> authorizerProvider,
 						 ObjectProvider<SecurityLogic> securityLogicProvider,
 						 ObjectProvider<HttpActionAdapter> httpActionAdapterProvider) {
-		authorizerProvider.
-		
+
 		final Config config = new Config(clients);
 		
 		if(StringUtils.hasText(pac4jProperties.getAllowedIpRegexpPattern())) {	
